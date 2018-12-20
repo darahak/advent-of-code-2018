@@ -1,10 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+const { getInput } = require('./utils');
 
 module.exports = function day1() {
-  const input = fs.readFileSync(path.resolve(__dirname, '../inputs/day1.txt'), {
-    encoding: 'utf8'
-  });
+  const input = getInput('day1.txt');
 
   const values = input.split('\n').map(line => Number.parseInt(line));
 
