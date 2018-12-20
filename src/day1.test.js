@@ -1,8 +1,14 @@
 test('Day 1', () => {
-  const day1 = require('./day1');
+  const { getInput } = require('./utils');
 
-  const res = day1();
+  const input = getInput('day1.txt');
+  const deltas = input
+    .split('\n')
+    .map(line => Number.parseInt(line))
+    .filter(line => !Number.isNaN(line));
 
-  console.log('Day 1 result: ', res);
-  expect(res).toBe(540);
+  const { part1, part2 } = require('./day1');
+
+  expect(part1(deltas)).toBe(540);
+  expect(part2(deltas)).toBe(73056);
 });

@@ -1,9 +1,27 @@
-const { getInput } = require('./utils');
+module.exports = {
+  part1(deltas) {
+    return deltas.reduce((acc, cur) => acc + cur);
+  },
 
-module.exports = function day1() {
-  const input = getInput('day1.txt');
+  part2(deltas) {
+    let hz = [];
+    let acc = 0;
 
-  const values = input.split('\n').map(line => Number.parseInt(line));
+    let i = 0;
 
-  return values.reduce((acc, cur) => (Number.isNaN(cur) ? acc : acc + cur));
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      acc += deltas[i++];
+
+      if (hz.includes(acc)) {
+        return acc;
+      }
+
+      hz.push(acc);
+
+      if (i === deltas.length) {
+        i = 0;
+      }
+    }
+  }
 };
