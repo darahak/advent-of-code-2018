@@ -1,37 +1,66 @@
 // @ts-check
 
+/**
+ * @typedef Claim
+ * @property {string} id
+ * @property {object} pos
+ * @property {number} pos.x
+ * @property {number} pos.y
+ * @property {object} size
+ * @property {number} size.width
+ * @property {number} size.height
+ */
+
 module.exports = {
   /**
    * @param {Array<string>} lines
    */
   part1(lines) {
     const fabricWidth = 1000;
-    let fabric = createSquareFabric(fabricWidth);
 
-    lines.forEach(line => {
-      const {
-        id,
-        pos: { x, y },
-        size: { width, height }
-      } = parseClaim(line);
-
-      for (let j = y; j < y + height; ++j) {
-        for (let i = x; i < x + width; ++i) {
-          const cellPos = fabricWidth * j + i;
-
-          fabric[cellPos] = fabric[cellPos] === '.' ? id : 'x';
-        }
-      }
-    });
-
-    return fabric.filter(cell => cell === 'x').length;
+    return applyClaimsToFabric(
+      createSquareFabric(fabricWidth),
+      fabricWidth,
+      lines.map(parseClaim)
+    ).filter(cell => cell === 'x').length;
   },
 
   /**
    * @param {Array<string>} lines
    */
   part2(lines) {
-    // TODO: Implement part 2.
+    const fabricWidth = 1000;
+
+    const claims = lines.map(parseClaim);
+    const fabric = applyClaimsToFabric(createSquareFabric(fabricWidth), fabricWidth, claims);
+
+    let intactId = '';
+
+    claims.forEach(claim => {
+      if (intactId !== '') {
+        return;
+      }
+
+      const {
+        id,
+        pos: { x, y },
+        size: { width, height }
+      } = claim;
+
+      intactId = id;
+
+      for (let j = y; j < y + height; ++j) {
+        for (let i = x; i < x + width; ++i) {
+          const cellPos = fabricWidth * j + i;
+
+          if (fabric[cellPos] === 'x') {
+            intactId = '';
+          }
+        }
+      }
+    });
+
+    return intactId;
   }
 };
 
@@ -41,6 +70,31 @@ module.exports = {
 function createSquareFabric(width) {
   let fabric = new Array(width * width);
   fabric.fill('.');
+
+  return fabric;
+}
+
+/**
+ * @param {Array<string>} fabric
+ * @param {number} fabricWidth
+ * @param {Array<Claim>} claims
+ */
+function applyClaimsToFabric(fabric, fabricWidth, claims) {
+  claims.forEach(claim => {
+    const {
+      id,
+      pos: { x, y },
+      size: { width, height }
+    } = claim;
+
+    for (let j = y; j < y + height; ++j) {
+      for (let i = x; i < x + width; ++i) {
+        const cellPos = fabricWidth * j + i;
+
+        fabric[cellPos] = fabric[cellPos] === '.' ? id : 'x';
+      }
+    }
+  });
 
   return fabric;
 }
