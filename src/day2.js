@@ -27,7 +27,7 @@ module.exports = {
   },
 
   part2(lines) {
-    const maxLength = lines[0].length;
+    const maxLength = lines[0].trim().length;
 
     for (let i = 0; i < lines.length; ++i) {
       for (let j = i; j < lines.length; ++j) {
@@ -54,5 +54,5 @@ function getCommonChars(first, second) {
     }
   });
 
-  return commonChars;
+  return commonChars.trim();
 }
