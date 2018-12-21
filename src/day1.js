@@ -1,8 +1,16 @@
+// @ts-check
+
 module.exports = {
+  /**
+   * @param {Array<number>} deltas
+   */
   part1(deltas) {
     return deltas.reduce((acc, cur) => acc + cur);
   },
 
+  /**
+   * @param {Array<number} deltas
+   */
   part2(deltas) {
     let hz = [];
     let acc = 0;
