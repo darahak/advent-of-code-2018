@@ -1,9 +1,7 @@
 // @ts-check
 
 module.exports = {
-  /**
-   * @param {Array<string>} lines
-   */
+  /** @param {Array<string>} lines */
   part1(lines) {
     let twos = 0;
     let threes = 0;
@@ -31,9 +29,7 @@ module.exports = {
     return twos * threes;
   },
 
-  /**
-   * @param {Array<string>} lines
-   */
+  /** @param {Array<string>} lines */
   part2(lines) {
     const maxLength = lines[0].trim().length;
 

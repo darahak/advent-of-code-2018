@@ -12,9 +12,7 @@
  */
 
 module.exports = {
-  /**
-   * @param {Array<string>} lines
-   */
+  /** @param {Array<string>} lines */
   part1(lines) {
     const fabricWidth = 1000;
 
@@ -25,9 +23,7 @@ module.exports = {
     ).filter(cell => cell === 'x').length;
   },
 
-  /**
-   * @param {Array<string>} lines
-   */
+  /** @param {Array<string>} lines */
   part2(lines) {
     const fabricWidth = 1000;
 
@@ -64,9 +60,7 @@ module.exports = {
   }
 };
 
-/**
- * @param {number} width
- */
+/** @param {number} width */
 function createSquareFabric(width) {
   let fabric = new Array(width * width);
   fabric.fill('.');
@@ -99,9 +93,7 @@ function applyClaimsToFabric(fabric, fabricWidth, claims) {
   return fabric;
 }
 
-/**
- * @param {string} line
- */
+/** @param {string} line */
 function parseClaim(line) {
   const claim = line.replace(/\s/, '');
 
