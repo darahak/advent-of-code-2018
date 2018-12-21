@@ -27,6 +27,32 @@ module.exports = {
   },
 
   part2(lines) {
-    // TODO: Implement part 2.
+    const maxLength = lines[0].length;
+
+    for (let i = 0; i < lines.length; ++i) {
+      for (let j = i; j < lines.length; ++j) {
+        const commonChars = getCommonChars(lines[i], lines[j]);
+        if (commonChars.length === maxLength - 1) {
+          return commonChars;
+        }
+      }
+    }
+
+    return '';
   }
 };
+
+function getCommonChars(first, second) {
+  const firstChars = first.split('');
+  const secondChars = second.split('');
+
+  let commonChars = '';
+
+  firstChars.forEach((c, i) => {
+    if (c === secondChars[i]) {
+      commonChars += c;
+    }
+  });
+
+  return commonChars;
+}
