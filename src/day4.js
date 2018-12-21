@@ -2,8 +2,14 @@
 
 /**
  * @typedef Record
- * @property {number} date
- * @property {number | string} record
+ * @property {number} date Actually just the minutes
+ * @property {number | string} record Can be a guard id, 'wake' or 'sleep'
+ */
+
+/**
+ * @typedef {number} GuardId
+ * @typedef {number} SleepTime
+ * @typedef {Map<GuardId, SleepTime>} RecordMap
  */
 
 module.exports = {
@@ -21,7 +27,7 @@ module.exports = {
   part2(lines) {}
 };
 
-/** @param {Array<Record>} records */
+/** @param {RecordMap} records */
 function findSleepiestGuard(records) {
   let maxId = 0;
   let maxSleep = 0;
@@ -36,8 +42,12 @@ function findSleepiestGuard(records) {
   return maxId;
 }
 
-/** @param {Array<Record>} records */
+/**
+ * @param {Array<Record>} records
+ * @returns {RecordMap}
+ */
 function createSleepRecords(records) {
+  /** @type RecordMap */
   let stats = new Map();
 
   let currentGuard = 0;
@@ -74,7 +84,10 @@ function createSleepRecords(records) {
   return stats;
 }
 
-/** @param {string} line */
+/**
+ * @param {string} line
+ * @returns {Record}
+ */
 function parseRecord(line) {
   const timestampStart = line.indexOf('[');
   const timestampEnd = line.indexOf(']');
@@ -85,12 +98,18 @@ function parseRecord(line) {
   return { date, record };
 }
 
-/** @param {string} text */
+/**
+ * @param {string} text
+ * @returns {number}
+ */
 function sanitizeDate(text) {
   return Number.parseInt(text.substring(text.indexOf(':') + 1));
 }
 
-/** @param {string} text */
+/**
+ * @param {string} text
+ * @returns {number | string}
+ */
 function sanitizeRecord(text) {
   if (text.includes('Guard')) {
     return Number.parseInt(text.replace('Guard #', '').replace(' begins shift', ''));
