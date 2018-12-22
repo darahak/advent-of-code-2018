@@ -16,16 +16,56 @@ module.exports = {
   /** @param {Array<string>} lines */
   part1(lines) {
     const sortedLines = lines.sort().map(parseRecord);
-    const records = createSleepRecords(sortedLines);
-    const sleepiestGuardId = findSleepiestGuard(records);
 
-    // FIXME: Should be (sleepiestGuardId * minuteWithMostSleep)
-    return sleepiestGuardId * records.get(sleepiestGuardId);
+    const sleepiestGuardId = findSleepiestGuard(createSleepRecords(sortedLines));
+    const minuteWithMostSleep = findMinuteWithMostSleep(sortedLines, sleepiestGuardId);
+
+    return sleepiestGuardId * minuteWithMostSleep;
   },
 
   /** @param {Array<string>} lines */
-  part2(lines) {}
+  part2(lines) {
+    // TODO
+  }
 };
+
+/**
+ * @param {Array<Record>} lines
+ * @param {number} guardId
+ */
+function findMinuteWithMostSleep(lines, guardId) {
+  let minutes = new Array(60);
+  minutes.fill(0);
+
+  let shouldCountSleepingMinutes = false;
+  let sleepStart = 0;
+
+  lines.forEach(line => {
+    if (typeof line.record === 'number') {
+      shouldCountSleepingMinutes = line.record === guardId;
+    } else if (shouldCountSleepingMinutes) {
+      switch (line.record) {
+        case 'sleep':
+          {
+            sleepStart = line.date;
+          }
+          break;
+
+        case 'wake':
+          {
+            for (let i = sleepStart; i < line.date; ++i) {
+              ++minutes[i];
+            }
+
+            sleepStart = 0;
+          }
+          break;
+      }
+    }
+  });
+
+  return minutes.indexOf(Math.max(...minutes));
+}
 
 /** @param {RecordMap} records */
 function findSleepiestGuard(records) {
