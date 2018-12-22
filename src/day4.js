@@ -8,8 +8,8 @@
 
 /**
  * @typedef {number} GuardId
- * @typedef {number} SleepTime
- * @typedef {Map<GuardId, SleepTime>} RecordMap
+ * @typedef {number} SleepMinutes
+ * @typedef {Map<GuardId, Array<SleepMinutes>>} RecordMap
  */
 
 module.exports = {
@@ -25,7 +25,23 @@ module.exports = {
 
   /** @param {Array<string>} lines */
   part2(lines) {
-    // TODO
+    const records = createSleepRecords(lines.sort().map(parseRecord));
+
+    let maxSleepTime = 0;
+    let maxMinute = 0;
+    let maxGuardId = 0;
+
+    records.forEach((minutes, guardId) => {
+      const tmpSleepTime = Math.max(...minutes);
+
+      if (tmpSleepTime > maxSleepTime) {
+        maxSleepTime = tmpSleepTime;
+        maxMinute = minutes.indexOf(tmpSleepTime);
+        maxGuardId = guardId;
+      }
+    });
+
+    return maxGuardId * maxMinute;
   }
 };
 
@@ -72,9 +88,11 @@ function findSleepiestGuard(records) {
   let maxId = 0;
   let maxSleep = 0;
 
-  records.forEach((sleepTime, guardId) => {
-    if (sleepTime > maxSleep) {
-      maxSleep = sleepTime;
+  records.forEach((sleepMinutes, guardId) => {
+    const totalSleep = sleepMinutes.reduce((acc, cur) => acc + cur);
+
+    if (totalSleep > maxSleep) {
+      maxSleep = totalSleep;
       maxId = guardId;
     }
   });
@@ -100,7 +118,10 @@ function createSleepRecords(records) {
       currentGuard = record;
 
       if (!stats.has(currentGuard)) {
-        stats.set(currentGuard, 0);
+        let minutes = new Array(60);
+        minutes.fill(0);
+
+        stats.set(currentGuard, minutes);
       }
     } else {
       switch (record) {
@@ -111,10 +132,13 @@ function createSleepRecords(records) {
           break;
         case 'wake':
           {
-            const sleepTime = stats.get(currentGuard);
-            const diff = currentDate - lastDate;
+            let sleepMinutes = stats.get(currentGuard);
 
-            stats.set(currentGuard, sleepTime + diff);
+            for (let i = lastDate; i < currentDate; ++i) {
+              ++sleepMinutes[i];
+            }
+
+            stats.set(currentGuard, sleepMinutes);
           }
           break;
       }
