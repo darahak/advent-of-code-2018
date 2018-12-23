@@ -62,10 +62,7 @@ module.exports = {
 
 /** @param {number} width */
 function createSquareFabric(width) {
-  let fabric = new Array(width * width);
-  fabric.fill('.');
-
-  return fabric;
+  return new Array(width * width).fill('.');
 }
 
 /**

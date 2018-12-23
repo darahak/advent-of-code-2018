@@ -50,8 +50,7 @@ module.exports = {
  * @param {number} guardId
  */
 function findMinuteWithMostSleep(lines, guardId) {
-  let minutes = new Array(60);
-  minutes.fill(0);
+  let minutes = new Array(60).fill(0);
 
   let shouldCountSleepingMinutes = false;
   let sleepStart = 0;
