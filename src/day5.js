@@ -1,3 +1,5 @@
+// @ts-check
+
 module.exports = {
   /** @param {string} input */
   part1(input) {
