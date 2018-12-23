@@ -49,11 +49,8 @@ function getDistance(p1, p2) {
  * @returns {Grid}
  */
 function createGrid(locations) {
-  const xs = locations.map(p => p.x);
-  const ys = locations.map(p => p.y);
-
-  const width = Math.max(...xs) + 1;
-  const height = Math.max(...ys) + 1;
+  const width = Math.max(...locations.map(p => p.x)) + 1;
+  const height = Math.max(...locations.map(p => p.y)) + 1;
 
   return {
     view: new Array(width * height).fill(''),
