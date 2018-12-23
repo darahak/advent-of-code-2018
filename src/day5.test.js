@@ -6,5 +6,5 @@ test('Day 5', () => {
   const line = input.split('\n')[0];
 
   expect(part1(line)).toBe(11264);
-  expect(part2(line)).toBe(0);
+  expect(part2(line)).toBe(4552);
 });
