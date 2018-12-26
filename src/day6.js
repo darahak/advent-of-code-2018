@@ -29,7 +29,10 @@ module.exports = {
     );
   },
 
-  /** @param {Array<string>} lines */
+  /**
+   * @param {Array<string>} lines
+   * @returns {number}
+   */
   part2(lines) {
     const locations = parseCoordinates(lines);
     const grid = populateGrid(createGrid(locations), locations);
