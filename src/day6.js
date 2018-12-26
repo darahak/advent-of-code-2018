@@ -20,24 +20,28 @@ module.exports = {
    */
   part1(lines) {
     const locations = parseCoordinates(lines);
-    const { view, width, height } = createGrid(locations);
+    let grid = createGrid(locations);
 
-    for (let y = 0; y < height; ++y) {
-      for (let x = 0; x < width; ++x) {
+    for (let y = 0; y < grid.height; ++y) {
+      for (let x = 0; x < grid.width; ++x) {
         const closestLocations = getIndexOfClosestLocations({ x, y }, locations);
-        const pos = y * width + x;
+        const pos = y * grid.width + x;
 
         if (closestLocations.length > 1) {
-          view[pos] = '.';
+          grid.view[pos] = '.';
         } else if (closestLocations.length === 1) {
-          view[pos] = closestLocations[0].toString();
+          grid.view[pos] = closestLocations[0].toString();
         } else {
           throw new Error('No closest location found');
         }
       }
     }
 
-    dumpGrid(view, width, height);
+    return Math.max(
+      ...getIndexOfFiniteAreas(locations, grid).map(
+        id => grid.view.filter(cell => cell === id.toString()).length
+      )
+    );
   },
 
   /** @param {Array<string>} lines */
@@ -46,21 +50,39 @@ module.exports = {
   }
 };
 
-function dumpGrid(view, width, height) {
-  const viewCopy = Array.from(view);
+/**
+ * @param {Array<Point>} locations
+ * @param {Grid} grid
+ * @returns {Array<number>}
+ */
+function getIndexOfFiniteAreas(locations, grid) {
+  let borderValues = [];
 
-  for (let i = 0; i < viewCopy.length; ++i) {
-    viewCopy[i] = viewCopy[i].padStart(2, ' ');
+  for (let x = 0; x < grid.width; ++x) {
+    // Top.
+    borderValues.push(grid.view[x]);
+    // Bottom.
+    borderValues.push(grid.view[grid.width * (grid.height - 1) + x]);
   }
 
-  for (let i = width - 1; i < width * height; i += width) {
-    viewCopy[i] += '\n';
+  for (let y = 1; y < grid.height - 1; ++y) {
+    // Left.
+    borderValues.push(grid.view[grid.width * y]);
+    // Right.
+    borderValues.push(grid.view[grid.width * y + grid.width - 1]);
   }
 
-  const fs = require('fs');
-  const path = require('path');
+  borderValues = [...new Set(borderValues)];
 
-  fs.writeFileSync(path.resolve(__dirname, '..', 'out', 'grid.txt'), viewCopy.join(' '));
+  let finiteAreas = [];
+
+  for (let i = 0; i < locations.length; ++i) {
+    if (!borderValues.includes(i.toString())) {
+      finiteAreas.push(i);
+    }
+  }
+
+  return finiteAreas;
 }
 
 /**
