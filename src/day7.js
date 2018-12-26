@@ -19,61 +19,46 @@ module.exports = {
    * @returns {string}
    */
   part1(lines) {
-    const steps = parseSteps(lines);
+    let allNodes = createNodes(parseSteps(lines));
 
-    /** @type {Map<string, Node>} */
-    let nodes = new Map();
+    /** @type Array<string> */
+    let nextNodeIds = [];
 
-    steps.forEach(({ first, second }) => {
-      if (!nodes.has(first)) {
-        nodes.set(first, new Node(first, [], [second]));
-      } else {
-        let node = nodes.get(first);
-        node.after.push(second);
-
-        nodes.set(first, node);
-      }
-
-      if (!nodes.has(second)) {
-        nodes.set(second, new Node(second, [first], []));
-      } else {
-        let node = nodes.get(second);
-        node.before.push(first);
-
-        nodes.set(second, node);
-      }
-    });
-
-    /** @type Array<Node> */
-    let currentNodes = [];
-
-    // First pass.
-    nodes.forEach(node => {
+    allNodes.forEach(node => {
       if (node.before.length === 0) {
-        currentNodes.push(node);
+        nextNodeIds.push(node.id);
       }
     });
 
-    /** @type string */
     let orderedSteps = '';
 
-    // FIXME: Take prerequisites into account.
-    while (currentNodes.length > 0) {
-      currentNodes.sort(sortById);
+    while (nextNodeIds.length > 0) {
+      nextNodeIds.sort();
 
-      const { id, after } = currentNodes[0];
+      const targetNode = allNodes.get(nextNodeIds.shift());
 
-      currentNodes.splice(0, 1);
-      nodes.delete(id);
+      orderedSteps += targetNode.id;
 
-      after.forEach(nodeId => {
-        const toAdd = nodes.get(nodeId);
-        if (toAdd && !currentNodes.includes(toAdd)) {
-          currentNodes.push(toAdd);
+      allNodes.delete(targetNode.id);
+
+      targetNode.after.forEach(nextNodeId => {
+        if (allNodes.has(nextNodeId)) {
+          const nextNode = allNodes.get(nextNodeId);
+
+          let prereqConsumed = true;
+
+          for (let prereq of nextNode.before) {
+            if (allNodes.has(prereq)) {
+              prereqConsumed = false;
+              break;
+            }
+          }
+
+          if (!nextNodeIds.includes(nextNodeId) && prereqConsumed) {
+            nextNodeIds.push(nextNodeId);
+          }
         }
       });
-
-      orderedSteps += id;
     }
 
     return orderedSteps;
@@ -85,12 +70,33 @@ module.exports = {
 };
 
 /**
- * @param {Node} a
- * @param {Node} b
- * @returns {number}
+ * @param {Array<Step>} steps
+ * @returns {Map<string, Node>}
  */
-function sortById(a, b) {
-  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+function createNodes(steps) {
+  let nodes = new Map();
+
+  steps.forEach(({ first, second }) => {
+    if (!nodes.has(first)) {
+      nodes.set(first, new Node(first, [], [second]));
+    } else {
+      let node = nodes.get(first);
+      node.after.push(second);
+
+      nodes.set(first, node);
+    }
+
+    if (!nodes.has(second)) {
+      nodes.set(second, new Node(second, [first], []));
+    } else {
+      let node = nodes.get(second);
+      node.before.push(first);
+
+      nodes.set(second, node);
+    }
+  });
+
+  return nodes;
 }
 
 /**
