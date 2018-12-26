@@ -6,6 +6,5 @@ test('Day 6', () => {
   const lines = input.split('\n').filter(line => line.length > 0);
 
   expect(part1(lines)).toBe(3420);
-  // FIXME: Insert solution.
-  // expect(part2(lines)).toBe(0);
+  expect(part2(lines)).toBe(46667);
 });

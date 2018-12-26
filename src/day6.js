@@ -20,22 +20,7 @@ module.exports = {
    */
   part1(lines) {
     const locations = parseCoordinates(lines);
-    let grid = createGrid(locations);
-
-    for (let y = 0; y < grid.height; ++y) {
-      for (let x = 0; x < grid.width; ++x) {
-        const closestLocations = getIndexOfClosestLocations({ x, y }, locations);
-        const pos = y * grid.width + x;
-
-        if (closestLocations.length > 1) {
-          grid.view[pos] = '.';
-        } else if (closestLocations.length === 1) {
-          grid.view[pos] = closestLocations[0].toString();
-        } else {
-          throw new Error('No closest location found');
-        }
-      }
-    }
+    const grid = populateGrid(createGrid(locations), locations);
 
     return Math.max(
       ...getIndexOfFiniteAreas(locations, grid).map(
@@ -46,9 +31,46 @@ module.exports = {
 
   /** @param {Array<string>} lines */
   part2(lines) {
-    // TODO
+    const locations = parseCoordinates(lines);
+    const grid = populateGrid(createGrid(locations), locations);
+
+    const viewWithSafeAreas = grid.view.map((value, i) => {
+      const totalDistance = locations.reduce((sum, location) => {
+        return sum + getDistance(location, { x: i % grid.width, y: Math.floor(i / grid.width) });
+      }, 0);
+
+      return totalDistance < 10000 ? '#' : value;
+    });
+
+    return viewWithSafeAreas.filter(value => value === '#').length;
   }
 };
+
+/**
+ * @param {Grid} grid
+ * @param {Array<Point>} locations
+ * @returns {Grid}
+ */
+function populateGrid(grid, locations) {
+  const { width, height } = grid;
+
+  for (let y = 0; y < height; ++y) {
+    for (let x = 0; x < width; ++x) {
+      const closestLocations = getIndexOfClosestLocations({ x, y }, locations);
+      const pos = y * width + x;
+
+      if (closestLocations.length > 1) {
+        grid.view[pos] = '.';
+      } else if (closestLocations.length === 1) {
+        grid.view[pos] = closestLocations[0].toString();
+      } else {
+        throw new Error('No closest location found');
+      }
+    }
+  }
+
+  return grid;
+}
 
 /**
  * @param {Array<Point>} locations
