@@ -64,10 +64,102 @@ module.exports = {
     return orderedSteps;
   },
 
-  part2(lines) {
-    // TODO
+  /**
+   * @param {Array<string>} lines
+   * @param {string} expectedOrder
+   * @param {number} workerLimit
+   * @returns {number}
+   */
+  part2(lines, expectedOrder, workerLimit) {
+    let allNodes = createNodes(parseSteps(lines));
+    let taskQueue = expectedOrder.split('');
+
+    /** @type Map<string, number> */
+    let ongoingTasks = new Map(); // <id, remainingTime>
+    ongoingTasks.limit = workerLimit;
+
+    let totalDuration = 0;
+
+    while (taskQueue.length > 0) {
+      // Fetch new tasks.
+      if (ongoingTasks.size < ongoingTasks.limit) {
+        const nextTasks = getNextTasks(taskQueue, ongoingTasks, allNodes);
+
+        nextTasks.forEach(task => {
+          if (!ongoingTasks.has(task) && ongoingTasks.size < ongoingTasks.limit) {
+            ongoingTasks.set(task, getTaskDuration(task));
+          }
+        });
+      }
+
+      // Process ongoing tasks.
+      for (let [id] of ongoingTasks) {
+        let remainingTime = ongoingTasks.get(id);
+
+        if (--remainingTime > 0) {
+          ongoingTasks.set(id, remainingTime);
+        } else {
+          allNodes.delete(id);
+          ongoingTasks.delete(id);
+          taskQueue.splice(taskQueue.indexOf(id), 1);
+        }
+      }
+
+      ++totalDuration;
+    }
+
+    return totalDuration;
   }
 };
+
+/**
+ * @param {Array<string>} queue
+ * @param {Map<string, number>} ongoing
+ * @param {Map<string, Node>} nodes
+ * @returns {Array<string>}
+ */
+function getNextTasks(queue, ongoing, nodes) {
+  let nextTasks = [];
+
+  const it = nodes.values();
+
+  let added = 0;
+
+  while (added < ongoing.limit) {
+    const next = it.next();
+
+    if (next.done) {
+      break;
+    }
+
+    const task = next.value;
+
+    let shouldAdd = true;
+
+    for (let prereq of task.before) {
+      if (ongoing.has(prereq) || queue.includes(prereq)) {
+        shouldAdd = false;
+        break;
+      }
+    }
+
+    if (shouldAdd) {
+      nextTasks.push(task.id);
+      ++added;
+    }
+  }
+
+  return nextTasks;
+}
+
+/**
+ * @param {string} taskId
+ * @returns {number}
+ */
+function getTaskDuration(taskId) {
+  // Minus 64 which is the char code before 'A', plus 60 seconds from the instructions.
+  return taskId.charCodeAt(0) - 4;
+}
 
 /**
  * @param {Array<Step>} steps

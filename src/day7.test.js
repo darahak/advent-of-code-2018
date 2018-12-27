@@ -5,11 +5,14 @@ describe('Day 7', () => {
   const input = getInput('day7.txt');
   const lines = input.split('\n').filter(line => line.length > 0);
 
+  let order;
+
   test('Part 1', () => {
-    expect(part1(lines)).toBe('BCEFLDMQTXHZGKIASVJYORPUWN');
+    order = part1(lines);
+    expect(order).toBe('BCEFLDMQTXHZGKIASVJYORPUWN');
   });
 
   test('Part 2', () => {
-    // expect(part2(lines)).toBe(0);
+    expect(part2(lines, order, 5)).toBe(987);
   });
 });
